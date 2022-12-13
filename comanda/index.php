@@ -35,7 +35,8 @@ error_reporting(E_ALL);
 //$dotenv->load();
 
 $app = AppFactory::create();
-$app->setBasePath('/app');
+$app->setBasePath('/comanda');
+$app->add(new BasePathMiddleware($app));
 $app->addRoutingMiddleware();
 $app->addBodyParsingMiddleware();
 
