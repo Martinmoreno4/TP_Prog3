@@ -1,36 +1,45 @@
 <?php
 
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use Slim\Psr7\Response;
+use GuzzleHttp\Psr7\Log;
+use Slim\Handlers\Strategies\RequestHandler;
 
-class LoggerMiddleware
+class Logger
 {
-    /**
-     * Example middleware invokable class
-     *
-     * @param  ServerRequest  $request PSR-7 request
-     * @param  RequestHandler $handler PSR-15 request handler
-     *
-     * @return Response
-     */
-    public function __invoke(Request $request, RequestHandler $handler): Response
-    {   
-        // Fecha antes
-        $before = date('Y-m-d H:i:s');
-        
-        // Continua al controller
-        $response = $handler->handle($request);
-        $existingContent = json_decode($response->getBody());
-    
-        // Despues
-        $response = new Response();
-        $existingContent->fechaAntes = $before;
-        $existingContent->fechaDespues = date('Y-m-d H:i:s');
-        
-        $payload = json_encode($existingContent);
-
-        $response->getBody()->write($payload);
-        return $response->withHeader('Content-Type', 'application/json');
+    public static function OperationLog($request, $response, $next)
+    {
+        $retorno = $next($request, $response);
+        return $retorno;
     }
+
+    public static function validateGP($request, $handler)
+    {
+        
+        $requestType = $request->getMethod();
+        $response = $handler->handle($request);
+
+        if($requestType == 'GET')
+        {
+            $response->getBody()->write('<h1>GET Method</h1>');
+        }
+        else if($requestType == 'POST')
+        {
+            $response->getBody()->write('<h1>POST Method</h1>');
+            $data = $request->getParsedBody();
+            $name = $data['name'];
+            $type = $data['type'];
+
+            if ($type == 'Admin')
+            {
+                $response->getBody()->write('<h1> Welcome '.$name.'!</h1>');
+            }
+            else
+            {
+                $response->getBody()->write('<h1> You are not allowed to access this page!</h1>');
+            }
+        }
+
+        return $response;
+    }
+
 }
+?>
