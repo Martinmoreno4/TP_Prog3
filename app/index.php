@@ -35,7 +35,7 @@ error_reporting(E_ALL);
 //$dotenv->load();
 
 $app = AppFactory::create();
-$app->setBasePath('/Comanda');
+$app->setBasePath('/app');
 $app->addRoutingMiddleware();
 $app->addBodyParsingMiddleware();
 
@@ -116,6 +116,8 @@ $app->group('/empleados', function (RouteCollectorProxy $group)
     $group->get('/read_csv', \FileController::class . ':Read');
   })->add(\MWAccess::class . ':isAdmin');
 
+
+  
 // Run app
 $app->run();
 ?>
